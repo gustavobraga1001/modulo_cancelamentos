@@ -23,20 +23,4 @@
             </form>
         </field>
     </record>
-
-    <!-- Definição da ação para abrir as vistas de setores -->
-    <record id="action_project_sector" model="ir.actions.act_window">
-        <field name="name">Setores</field>
-        <field name="res_model">project.sector</field>
-        <field name="view_mode">tree,form</field>
-        <field name="target">current</field>
-    </record>
-
-    <!-- Definição do menu para setores na aba de projetos -->
-    <menuitem 
-        id="menu_project_sector" 
-        name="Setores" 
-        parent="project.menu_project_management" 
-        action="action_project_sector" 
-        sequence="30"/>
 </odoo>

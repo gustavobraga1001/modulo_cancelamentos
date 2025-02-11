@@ -7,7 +7,8 @@
     'data': [
         'security/ir.model.access.csv',
         'views/project_task_view.xml',
-        'views/project_sector_view.xml',  # Adiciona a view personalizada
+        'views/project_sector_view.xml',
+        'views/project_sector_menu.xml'
     ],
     'installable': True,
     'application': True,

@@ -5,10 +5,10 @@
         <field name="inherit_id" ref="project.view_task_form2"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='user_ids']" position="after">
-                <field name="setores_task" 
+                <field name="task_departments" 
                        widget="many2many_tags" 
                        options="{'no_create': True}"
-                       placeholder="Exemplo: Suporte - Braga, Viab - Bruna"/>
+                       placeholder="Suporte, Viabilidades"/>
             </xpath>
         </field>
     </record>
