@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_project_sector_access_all_users,Project Sector Access All Users,model_project_sector,base.group_user,1,1,0,0
+access_project_sector_access_admins,Project Sector Access Admins,model_project_sector,base.group_erp_manager,1,1,1,1
