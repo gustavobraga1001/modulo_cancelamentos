@@ -22,6 +22,8 @@ class ProjectTask(models.Model):
     def write(self, vals):
         cancellation_project = self.env['project.project'].search([('name', '=', 'TESTE')], limit=1)
 
+        self = self.with_context(mail_notify_force_send=False)
+
         in_progress_stage = self.env['project.task.type'].search([
             ('name', '=', 'Em andamento'),
             ('project_ids', 'in', [cancellation_project.id])
