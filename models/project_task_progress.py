@@ -49,7 +49,7 @@ class ProjectTask(models.Model):
         
         return result
 
-    def create_subtasks(self, record):
+    def validation_departments(self, record):
         department_responsibles = {}
         for department in record.task_departments:
             users = self.env['res.users'].search([('sector_ids', '=', department.id)])
