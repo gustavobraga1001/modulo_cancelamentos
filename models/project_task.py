@@ -20,8 +20,16 @@ class ProjectTask(models.Model):
         return super(ProjectTask, self).create(vals)
 
     def write(self, vals):
-        in_progress_stage = self.env['project.task.type'].search([('name', '=', 'Em andamento')], limit=1)
-        completed_stage = self.env['project.task.type'].search([('name', '=', 'Finalizados')], limit=1)
+        cancellation_project = self.env['project.project'].search([('name', '=', 'TESTE')], limit=1)
+
+        in_progress_stage = self.env['project.task.type'].search([
+            ('name', '=', 'Em andamento'),
+            ('project_ids', 'in', [cancellation_project.id])
+            ], limit=1)        
+        completed_stage = self.env['project.task.type'].search([
+            ('name', '=', 'Finalizados'), 
+            ('project_ids', 'in', [cancellation_project.id])
+            ], limit=1)
 
         if in_progress_stage or completed_stage:
             new_stage_id = vals.get('stage_id')
