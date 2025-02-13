@@ -38,7 +38,7 @@ class ProjectTask(models.Model):
             
             if new_stage_id == in_progress_stage.id:
                 for task in self:
-                    self.create_subtasks(task)
+                    self.validation_departments(task)
 
         result = super(ProjectTask, self).write(vals)
 
