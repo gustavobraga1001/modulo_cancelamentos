@@ -1,77 +1,63 @@
-from odoo import models, fields, api
 import json
+from odoo import models, fields, api
 
 class ProjectTask(models.Model):
     _inherit = 'project.task'
 
-    responsible_departments = fields.Text(
+    responsible_sectors = fields.Text(
         string="Responsável do Setor",
-        help="Responsible persons assigned to the departments in JSON format",
+        help="Responsible persons assigned to the sectors in JSON format",
     )
 
-    task_departments = fields.Many2many(
+    task_sectors = fields.Many2many(
         'project.sector', 
-        string='Departamentos Responsáveis',
-        help="Select the responsible departments.",
+        string='Setores Responsáveis',
+        help="Select the responsible sectors.",
     )
 
     @api.model
     def create(self, vals):
-        return super(ProjectTask, self).create(vals)
+        result = super(ProjectTask, self).create(vals)
+        return result
 
     def write(self, vals):
-        cancellation_project = self.env['project.project'].search([('name', '=', 'Retiradas e Cancelamento')], limit=1)
-
         self = self.with_context(mail_notify_force_send=False)
-
-        in_progress_stage = self.env['project.task.type'].search([
-            ('name', '=', 'Em andamento'),
-            ('project_ids', 'in', [cancellation_project.id])
-            ], limit=1)        
-        completed_stage = self.env['project.task.type'].search([
-            ('name', '=', 'Finalizados'), 
-            ('project_ids', 'in', [cancellation_project.id])
-            ], limit=1)
-
-        if in_progress_stage or completed_stage:
-            new_stage_id = vals.get('stage_id')
-            
-            if new_stage_id == in_progress_stage.id:
-                for task in self:
-                    self.validation_departments(task)
 
         result = super(ProjectTask, self).write(vals)
 
         if 'stage_id' in vals:
             for task in self:
-                if task.parent_id: 
-                    self._check_completed_subtasks(task.parent_id)
-        
+                if task.project_id.name == 'Retiradas e Cancelamento':
+                    if task.stage_id.name == 'Em andamento':
+                        task.validation_sectors(task)
+                    if task.parent_id and task.stage_id.name == "Finalizados": 
+                        self._check_completed_subtasks(task.parent_id)
+
         return result
 
-    def validation_departments(self, record):
-        department_responsibles = {}
-        for department in record.task_departments:
-            users = self.env['res.users'].search([('sector_ids', '=', department.id)])
+    def validation_sectors(self, record):
+        sector_responsibles = {}
+        for sector in record.task_sectors:
+            users = self.env['res.users'].search([('sector_ids', '=', sector.id)])
             
             if users:
-                if department.name not in department_responsibles:
-                    department_responsibles[department.name] = []
+                if sector.name not in sector_responsibles:
+                    sector_responsibles[sector.name] = []
                 for user in users:
-                    department_responsibles[department.name].append(user.id) 
+                    sector_responsibles[sector.name].append(user.id) 
 
-        record.responsible_departments = json.dumps(department_responsibles)
+        record.responsible_sectors = json.dumps(sector_responsibles)
 
-        for department, user_ids in department_responsibles.items():
-            department_stage = self.env['project.task.type'].search([('name', '=', department)], limit=1)
-            if department_stage:
+        for sector, user_ids in sector_responsibles.items():
+            sector_stage = self.env['project.task.type'].search([('name', '=', sector)], limit=1)
+            if sector_stage:
                 self._create_subtask(
-                    'Subtarefa de: %s - %s' % (record.name, department), 
+                    'Subtarefa de: %s - %s' % (record.name, sector), 
                     record, 
                     user_ids, 
-                    department_stage
+                    sector_stage
                 )
-
+        
     def _create_subtask(self, subtask_name, record, responsible_ids, stage):
         subtask = self.env['project.task'].create({
             'name': subtask_name,
@@ -97,7 +83,7 @@ class ProjectTask(models.Model):
             'date_deadline': fields.Date.today(),
         })
 
-    def _check_completed_subtasks(self, parent_task):        
+    def _check_completed_subtasks(self, parent_task):
         subtasks = self.env['project.task'].search([('parent_id', '=', parent_task.id)])
         
         all_finalized = False
@@ -107,7 +93,7 @@ class ProjectTask(models.Model):
         
         if all_finalized:
             self._create_activity_for_responsible(parent_task)
-            
+                    
     def _create_activity_for_responsible(self, task):
         if task.user_ids:
             user_responsible = task.user_ids[0]

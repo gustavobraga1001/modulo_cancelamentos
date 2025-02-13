@@ -5,7 +5,7 @@
         <field name="inherit_id" ref="project.view_task_form2"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='user_ids']" position="after">
-                <field name="task_departments" 
+                <field name="task_sectors" 
                        widget="many2many_tags" 
                        options="{'no_create': True}"
                        placeholder="Suporte, Viabilidades"/>
