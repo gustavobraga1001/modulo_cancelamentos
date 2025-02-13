@@ -20,7 +20,7 @@ class ProjectTask(models.Model):
         return super(ProjectTask, self).create(vals)
 
     def write(self, vals):
-        cancellation_project = self.env['project.project'].search([('name', '=', 'TESTE')], limit=1)
+        cancellation_project = self.env['project.project'].search([('name', '=', 'Retiradas e Cancelamento')], limit=1)
 
         self = self.with_context(mail_notify_force_send=False)
 
